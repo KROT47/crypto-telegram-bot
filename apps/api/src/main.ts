@@ -8,6 +8,6 @@ async function bootstrap() {
   app.useWebSocketAdapter(new WsAdapter(app));
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
   app.enableCors();
-  await app.listen(80);
+  await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

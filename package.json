@@ -7,6 +7,8 @@
   ],
   "scripts": {
     "start": "cd apps/app && pnpm run dev",
+    "start:api": "cd apps/api && pnpm run start:dev",
+    "start:api:prod": "cd apps/api && pnpm run start:prod",
     "clean": "pnpm run -r clean",
     "build": "pnpm run -r build",
     "test": "pnpm run -r test",
