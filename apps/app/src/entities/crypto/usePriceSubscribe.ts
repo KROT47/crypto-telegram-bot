@@ -16,10 +16,16 @@ type CMCCryptoItem = {
 
 export type CryptoData = CryptoItem[];
 
+const { VITE_API_WS_ORIGIN } = import.meta.env;
+
+if (VITE_API_WS_ORIGIN === undefined) {
+  throw Error('VITE_API_WS_ORIGIN env var is not defined');
+}
+
 export function useCryptoPriceSubscribe() {
   const [data, setData] = useState<CryptoData>();
 
-  const ws = useWS({ url: `ws://${location.hostname}:81` });
+  const ws = useWS({ url: VITE_API_WS_ORIGIN });
 
   useEffect(() => {
     if (ws !== undefined) {

@@ -2,7 +2,7 @@ import { WebSocketGateway, SubscribeMessage } from '@nestjs/websockets';
 import { PricesService } from './prices.service';
 import { WebSocket } from 'ws';
 
-@WebSocketGateway(81)
+@WebSocketGateway()
 export class PricesGateway {
   wsClientsMap = new Map<WebSocket, () => void>();
 
