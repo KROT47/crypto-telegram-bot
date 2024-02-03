@@ -1,16 +1,12 @@
-import { useMemo, useRef, useState } from 'react';
-import { Dialog } from 'primereact/dialog';
-import {
-  CryptoData,
-  CryptoName,
-  getCryptoIcon,
-} from '../../../entities/crypto';
-import { Signal, signalsUrl } from '../../../entities/signals';
-import { formatPercent, formatPrice } from '../../../shared/utils';
 import { Button } from 'primereact/button';
+import { Dialog } from 'primereact/dialog';
+import { useMemo, useRef, useState } from 'react';
+import { CryptoData, CryptoName } from '../../../entities/crypto';
+import { Signal, signalsUrl } from '../../../entities/signals';
 
-import styles from './SignalsTable.module.scss';
+import { formatPercent, formatPrice } from 'apps/app/src/shared/utils';
 import { SignalsForm } from '../SignalsForm';
+import styles from './SignalsTable.module.scss';
 
 export function SignalsTable({
   data,

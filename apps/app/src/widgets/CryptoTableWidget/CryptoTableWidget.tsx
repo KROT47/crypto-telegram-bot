@@ -1,4 +1,4 @@
-import { CryptoData, CryptoName, getCryptoIcon } from '../../entities/crypto';
+import { CryptoData, CryptoName } from '../../entities/crypto';
 import { formatPercent, formatPrice } from '../../shared/utils';
 
 import styles from './CryptoTableWidget.module.scss';

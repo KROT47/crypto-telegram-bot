@@ -1,9 +1,3 @@
-const priceIntl = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  currencyDisplay: 'narrowSymbol',
-});
+import { getPriceFormatter } from 'packages/utils';
 
-export function formatPrice(amount: number): string {
-  return priceIntl.format(amount);
-}
+export const formatPrice = getPriceFormatter();

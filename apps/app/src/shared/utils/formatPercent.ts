@@ -1,9 +1,3 @@
-const percentIntl = new Intl.NumberFormat('en-US', {
-  style: 'percent',
-  maximumFractionDigits: 3,
-  signDisplay: 'never',
-});
+import { getPercentFormatter } from 'packages/utils';
 
-export function formatPercent(percent: number): string {
-  return percentIntl.format(percent / 100);
-}
+export const formatPercent = getPercentFormatter({ signDisplay: 'never' });
