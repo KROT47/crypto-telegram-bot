@@ -1,0 +1,20 @@
+.cryptoIcon {
+  width: 24px;
+  height: 24px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.cryptoName {
+  font-weight: bold;
+}

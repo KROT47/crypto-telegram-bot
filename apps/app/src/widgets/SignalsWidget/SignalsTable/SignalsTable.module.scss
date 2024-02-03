@@ -1,0 +1,25 @@
+.table {
+  border-collapse: collapse;
+  width: 100%;
+
+  tr {
+    border-top: solid 1px gray;
+  }
+
+  thead {
+    tr {
+      &:first-of-type {
+        border-top: none;
+      }
+    }
+  }
+
+  th,
+  td {
+    padding: 5px 0;
+  }
+
+  th {
+    text-align: left;
+  }
+}

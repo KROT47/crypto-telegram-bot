@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.build.json",
+
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@crypto-telegram-bot/components/*": ["packages/components/src/*"],
+      "@crypto-telegram-bot/*": ["packages/*/src"]
+    },
+    "noEmit": true
+  }
+}
