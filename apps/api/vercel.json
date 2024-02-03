@@ -1,10 +1,5 @@
 {
   "version": 2,
-  "env": {
-    "COINMARKETCAP_TOKEN": "@coinmarketcap_token",
-    "COINMARKETCAP_POLL_INTERVAL": "@coinmarketcap_poll_interval",
-    "TELEGRAM_BOT_TOKEN": "@telegram_bot_token"
-  },
   "builds": [
     {
       "src": "src/main.ts",
