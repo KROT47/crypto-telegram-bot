@@ -1,9 +1,9 @@
 {
   "version": 2,
   "env": {
-    "COINMARKETCAP_TOKEN": "@COINMARKETCAP_TOKEN",
-    "COINMARKETCAP_POLL_INTERVAL": "@COINMARKETCAP_POLL_INTERVAL",
-    "TELEGRAM_BOT_TOKEN": "@TELEGRAM_BOT_TOKEN"
+    "COINMARKETCAP_TOKEN": "@coinmarketcap_token",
+    "COINMARKETCAP_POLL_INTERVAL": "@coinmarketcap_poll_interval",
+    "TELEGRAM_BOT_TOKEN": "@telegram_bot_token"
   },
   "builds": [
     {
