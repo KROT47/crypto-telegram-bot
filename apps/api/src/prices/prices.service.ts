@@ -7,6 +7,7 @@ export type PriceUpdateHandler = (data: CMCData) => void;
 export class PricesService {
   private handlers: PriceUpdateHandler[] = [];
   private pricesAPI: PricesAPI;
+  private lastData: CMCData | undefined;
   private _unsubscribe: (() => void) | undefined;
 
   constructor() {
@@ -18,7 +19,7 @@ export class PricesService {
 
     const pollIntervalMs = COINMARKETCAP_POLL_INTERVAL
       ? Number(COINMARKETCAP_POLL_INTERVAL)
-      : 5000;
+      : 60000;
     this.pricesAPI = getPriceAPI(COINMARKETCAP_TOKEN, { pollIntervalMs });
   }
 
@@ -31,6 +32,7 @@ export class PricesService {
     if (this._unsubscribe) return;
 
     this._unsubscribe = this.pricesAPI.priceSubscribe(data => {
+      this.lastData = data;
       this.handlers.forEach(handler => handler(data));
     });
   }
@@ -38,6 +40,8 @@ export class PricesService {
   subscribeForPriceUpdates(handler: PriceUpdateHandler): () => void {
     this.handlers.push(handler);
     this.runPriceUpdates();
+
+    if (this.lastData !== undefined) handler(this.lastData);
 
     return () => {
       const index = this.handlers.indexOf(handler);
