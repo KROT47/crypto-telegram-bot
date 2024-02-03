@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { signalsUrl } from './signalsUrl';
 import { Signal } from './Signal';
+import { signalsUrl } from './signalsUrl';
 
 export function useSignals(retry: number): Signal[] {
   const [signals, setSignals] = useState<Signal[]>([]);

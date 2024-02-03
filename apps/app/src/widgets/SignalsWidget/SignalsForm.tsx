@@ -4,7 +4,11 @@ import { InputNumber } from 'primereact/inputnumber';
 import { SelectButton } from 'primereact/selectbutton';
 import { useEffect, useRef, useState } from 'react';
 import { CryptoData, CryptoItem, getCryptoIcon } from '../../entities/crypto';
-import { Signal, signalsUrl } from '../../entities/signals';
+import {
+  Signal,
+  createSignalRequest,
+  updateSignalRequest,
+} from '../../entities/signals';
 
 const signalOptionTemplate = (option: CryptoItem) => {
   return (
@@ -49,6 +53,7 @@ export function SignalsForm({
   editItem?: Signal;
   onUpdate: () => void;
 }) {
+  const [error, setError] = useState<string>();
   const [selectedOption, setSelectedOption] = useState(options[0]);
   const [selectedCrypto, setSelectedCrypto] = useState<CryptoItem>();
   const [priceDelta, setPriceDelta] = useState<number | null>(null);
@@ -95,39 +100,40 @@ export function SignalsForm({
     !numberIsInRange(timeFrame, minTimeFrame, maxTimeFrame);
 
   const handleSubmit = async () => {
-    if (disabled || isLoadingRef.current) return;
+    const delta = selectedOption === 'price' ? priceDelta : percentDelta;
+
+    if (
+      disabled ||
+      isLoadingRef.current ||
+      delta === null ||
+      timeFrame === null
+    ) {
+      return;
+    }
     isLoadingRef.current = true;
+
+    setError(undefined);
 
     const formData = {
       symbol: selectedCrypto.symbol,
       type: selectedOption,
-      delta: selectedOption === 'price' ? priceDelta : percentDelta,
+      delta,
       timeFrame,
     };
 
-    let url = signalsUrl;
-    let method = 'post';
-
-    if (editItem) {
-      url = new URL(url);
-      url.pathname += `/${editItem.id}`;
-      method = 'put';
-    }
-
     try {
-      await fetch(url, {
-        method,
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      await (editItem
+        ? updateSignalRequest(editItem.id, formData)
+        : createSignalRequest(formData));
+
+      if (!editItem) clearForm();
     } catch (e) {
+      if (e instanceof Error) {
+        setError(e.message);
+      }
       console.error(e);
     }
 
-    if (!editItem) clearForm();
     onUpdate();
 
     isLoadingRef.current = false;
@@ -195,6 +201,8 @@ export function SignalsForm({
           />
           <span className="p-inputgroup-addon">min</span>
         </div>
+
+        <div style={{ color: 'var(--red-600)' }}>{error}</div>
 
         <div className="p-inputgroup flex-1">
           <Button

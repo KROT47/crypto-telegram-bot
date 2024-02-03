@@ -2,7 +2,7 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { useMemo, useRef, useState } from 'react';
 import { CryptoData, CryptoName } from '../../../entities/crypto';
-import { Signal, signalsUrl } from '../../../entities/signals';
+import { Signal, deleteSignalRequest } from '../../../entities/signals';
 
 import { formatPercent, formatPrice } from 'apps/app/src/shared/utils';
 import { SignalsForm } from '../SignalsForm';
@@ -37,9 +37,7 @@ export function SignalsTable({
   const handleRemove = async (id: string) => {
     if (!confirm('Remove this signal?')) return;
 
-    const url = new URL(signalsUrl);
-    url.pathname += `/${id}`;
-    await fetch(url, { method: 'delete' });
+    await deleteSignalRequest(id);
 
     onUpdate();
   };
