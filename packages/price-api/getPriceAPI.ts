@@ -1,4 +1,21 @@
-export type CMCData = Record<string, unknown>;
+export type CMCStatus = {
+  timestamp: string;
+};
+
+export type CMCItem = {
+  id: number;
+  symbol: string;
+  quote: {
+    USD: {
+      price: number;
+    };
+  };
+};
+
+export type CMCData = {
+  status: CMCStatus;
+  data: CMCItem[];
+};
 
 type Handler = (data: CMCData) => void;
 
@@ -38,10 +55,9 @@ export function getPriceAPI(
       handlers.forEach(handler => handler(data));
 
       setTimeout(() => {
+        isRunning = false;
         runPriceFetch();
       }, pollIntervalMs);
-
-      isRunning = false;
     }
   };
 
