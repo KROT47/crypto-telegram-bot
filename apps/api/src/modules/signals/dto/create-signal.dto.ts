@@ -1,8 +1,14 @@
-import { IsIn, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { getTelegramBotToken } from 'apps/api/src/entities/telegramWebApp';
+import { IsValidTelegramInitData } from 'apps/api/src/shared/telegramWebApp';
+import { IsEmpty, IsIn, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class CreateSignalDto {
+  @IsEmpty()
+  chat_id: number;
+
   @IsNotEmpty()
   @IsString()
+  @IsValidTelegramInitData(getTelegramBotToken)
   initData: string;
 
   @IsNotEmpty()

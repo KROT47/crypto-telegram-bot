@@ -5,6 +5,9 @@ import { UpdateSignalDto } from './dto/update-signal.dto';
 import { PricesService } from '../prices/prices.service';
 import { CMCData } from 'packages/price-api';
 import { formatPercent, formatPrice } from '../../shared/utils';
+import { parseInitData } from '@tma.js/sdk';
+import { sendTelegramBotNotification } from '../../shared/telegramWebApp';
+import { getTelegramBotToken } from '../../entities/telegramWebApp';
 
 type SignalDto = CreateSignalDto & { id: string };
 type SignalData = {
@@ -91,7 +94,7 @@ export class SignalsService {
         // init signal with data
         signalsMap.set(signal, this.getSignalData(signal, dataIndex));
       } else {
-        const { symbol, delta, timeFrame, type } = signal;
+        const { symbol, delta, timeFrame, type, chat_id } = signal;
         const { ts: prevTs, price: prevPrice } = signalData;
         const { ts, price } = itemData;
 
@@ -108,27 +111,26 @@ export class SignalsService {
             (type === 'price' && Math.abs(priceDelta) > delta) ||
             (type === 'percent' && Math.abs(percentDelta) > delta)
           ) {
-            // notification
-            console.log(
-              `${symbol} price change: ${
-                type === 'price'
-                  ? formatPrice(priceDelta)
-                  : formatPercent(percentDelta)
-              } (${
-                type === 'price'
-                  ? formatPercent(percentDelta)
-                  : formatPrice(priceDelta)
-              })`
-            );
-            console.log(`------------------------`);
-            console.log(`Triggered signal config:`);
-            console.log(`Crypto: ${symbol}`);
-            console.log(
-              `Delta: ${
-                type === 'price' ? formatPrice(delta) : formatPercent(delta)
-              }`
-            );
-            console.log(`Time frame: ${timeFrame} min`);
+            sendTelegramBotNotification({
+              chat_id,
+              message: [
+                `**${symbol}** price change: **${
+                  type === 'price'
+                    ? formatPrice(priceDelta)
+                    : formatPercent(percentDelta)
+                }** (${
+                  type === 'price'
+                    ? formatPercent(percentDelta)
+                    : formatPrice(priceDelta)
+                })`,
+                `------------------------`,
+                `Triggered by signal: ${symbol} - ${
+                  type === 'price' ? formatPrice(delta) : formatPercent(delta)
+                } - ${timeFrame} min`,
+              ].join('\n'),
+              token: getTelegramBotToken(),
+              parse_mode: 'markdown',
+            });
 
             // eslint-disable-next-line
             // console.log('>>>77', {
@@ -187,9 +189,13 @@ export class SignalsService {
   create(createSignalDto: CreateSignalDto) {
     this.runPriceUpdates();
 
+    const data = parseInitData(createSignalDto.initData);
+    const chat_id = data.user?.id as number;
+
     const signal = {
-      id: uuidv4(),
       ...createSignalDto,
+      id: uuidv4(),
+      chat_id,
     };
     this.signals.push(signal);
 
