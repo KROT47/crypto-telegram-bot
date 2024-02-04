@@ -180,7 +180,7 @@ export function SignalsForm({
           <div className="p-inputgroup flex-1">
             <InputNumber
               mode="decimal"
-              maxFractionDigits={3}
+              maxFractionDigits={6}
               min={minPercentDelta}
               max={maxPercentDelta}
               placeholder="Percent delta"
