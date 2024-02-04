@@ -73,9 +73,6 @@ export class SignalsService {
 
     if (lastDataIndex === undefined || signalsMap.size === 0) return;
 
-    // eslint-disable-next-line
-    // console.log('>>>62 COMPARING');
-
     signalsMap.forEach((signalData, signal) => {
       const lastItemData = lastDataIndex[signal.symbol];
       const itemData = dataIndex[signal.symbol];
@@ -85,12 +82,6 @@ export class SignalsService {
         lastItemData === undefined ||
         itemData === undefined
       ) {
-        // eslint-disable-next-line
-        // console.log('>>>67', {
-        //   signalData,
-        //   lastItemData,
-        // });
-
         // init signal with data
         signalsMap.set(signal, this.getSignalData(signal, dataIndex));
       } else {
@@ -132,32 +123,11 @@ export class SignalsService {
               parse_mode: 'markdown',
             });
 
-            // eslint-disable-next-line
-            // console.log('>>>77', {
-            //   prevPrice,
-            //   price,
-            //   d: Math.abs(price - prevPrice),
-            //   delta,
-            //   timeDelta: (ts - prevTs) / 1000 / 60,
-            // });
-
             shouldUpdateSignalData = true;
           }
-
-          // eslint-disable-next-line
-          // console.log('>>>103', {
-          //   prevPrice,
-          //   price,
-          //   d: Math.abs((price - prevPrice) / prevPrice),
-          //   delta,
-          //   timeDelta: (ts - prevTs) / 1000 / 60,
-          // });
         }
 
         if (shouldUpdateSignalData) {
-          // eslint-disable-next-line
-          // console.log('>>>112', { timeDelta: (ts - prevTs) / 1000 / 60 });
-
           signalsMap.set(signal, this.getSignalData(signal, dataIndex));
         }
       }
@@ -200,9 +170,6 @@ export class SignalsService {
     this.signals.push(signal);
 
     this.signalsMap.set(signal, this.getSignalData(signal, this.lastDataIndex));
-
-    // eslint-disable-next-line
-    // console.log('>>>162', this.getSignalData(signal, this.lastDataIndex));
   }
 
   findAll() {

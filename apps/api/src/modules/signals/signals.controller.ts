@@ -17,9 +17,6 @@ export class SignalsController {
 
   @Post()
   create(@Body() createSignalDto: CreateSignalDto) {
-    // eslint-disable-next-line
-    console.log('>>>20', createSignalDto);
-
     return this.signalsService.create(createSignalDto);
   }
 

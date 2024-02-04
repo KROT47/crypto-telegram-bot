@@ -1,4 +1,3 @@
-import { webApp } from '../webApp';
 import { signalsUrl } from './signalsUrl';
 
 export type SignalFormData = {
