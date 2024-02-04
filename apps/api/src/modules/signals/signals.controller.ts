@@ -7,6 +7,7 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+
 import { CreateSignalDto } from './dto/create-signal.dto';
 import { UpdateSignalDto } from './dto/update-signal.dto';
 import { SignalsService } from './signals.service';
