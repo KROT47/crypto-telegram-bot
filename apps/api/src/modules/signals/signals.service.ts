@@ -1,6 +1,5 @@
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
-import { parseInitData } from '@tma.js/sdk';
 import { Request } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { getUserId } from '../../entities/auth';
@@ -15,77 +14,102 @@ import {
   getDataIndex,
   getSignalData,
 } from './helpers';
+import { getTelegramBotToken } from '../../entities/telegramWebApp';
+
+type State = {
+  signals: SignalDto[];
+  signalsMap: Map<SignalDto, SignalData | undefined>;
+  lastDataIndex: DataIndex | undefined;
+  _unsubscribe: (() => void) | undefined;
+};
+
+const state: State = {
+  signals: [],
+  signalsMap: new Map<SignalDto, SignalData | undefined>(),
+  lastDataIndex: undefined,
+  _unsubscribe: undefined,
+};
+
+function unsubscribe() {
+  state._unsubscribe?.();
+  state._unsubscribe = undefined;
+}
 
 @Injectable({ scope: Scope.REQUEST })
 export class SignalsService {
-  private signals: SignalDto[] = [];
-  private signalsMap = new Map<SignalDto, SignalData | undefined>();
-  private lastDataIndex: DataIndex | undefined;
-  private _unsubscribe: (() => void) | undefined;
-
   constructor(
     private readonly pricesService: PricesService,
     @Inject(REQUEST) private readonly request: Request
   ) {}
 
   private get userId() {
-    return getUserId(this.request);
+    return getUserId(this.request, getTelegramBotToken());
   }
 
   private comparePrices(dataIndex: DataIndex) {
-    const { lastDataIndex, signalsMap } = this;
+    const { lastDataIndex, signalsMap } = state;
     comparePrices({ dataIndex, lastDataIndex, signalsMap });
   }
 
-  private unsubscribe() {
-    this._unsubscribe?.();
-    this._unsubscribe = undefined;
-  }
-
   private runPriceUpdates() {
-    if (this._unsubscribe) return;
+    if (state._unsubscribe) return;
 
-    this._unsubscribe = this.pricesService.subscribeForPriceUpdates(data => {
+    state._unsubscribe = this.pricesService.subscribeForPriceUpdates(data => {
       const newDataIndex = getDataIndex(data);
       this.comparePrices(newDataIndex);
-      this.lastDataIndex = newDataIndex;
+      state.lastDataIndex = newDataIndex;
     });
   }
 
-  create(createSignalDto: CreateSignalDto) {
-    this.runPriceUpdates();
+  private checkAuthorisedAndReturnChatId() {
+    const chat_id = this.userId;
+    if (chat_id === undefined) throw new Error('Unauthenticated');
+    return chat_id;
+  }
 
-    const data = parseInitData(createSignalDto.initData);
-    const chat_id = data.user?.id as number;
+  create(createSignalDto: CreateSignalDto) {
+    const chat_id = this.checkAuthorisedAndReturnChatId();
+
+    this.runPriceUpdates();
 
     const signal = {
       ...createSignalDto,
       id: uuidv4(),
       chat_id,
     };
-    this.signals.push(signal);
+    state.signals.push(signal);
 
-    this.signalsMap.set(signal, getSignalData(signal, this.lastDataIndex));
+    state.signalsMap.set(signal, getSignalData(signal, state.lastDataIndex));
   }
 
   findAll() {
-    this.userId;
+    const chat_id = this.userId;
 
-    return this.signals.reverse();
+    return state.signals
+      .filter(({ chat_id: ch_id }) => ch_id === chat_id)
+      .reverse();
   }
 
   update(updateId: string, updateSignalDto: UpdateSignalDto) {
-    const signal = this.signals.find(({ id }) => id === updateId);
+    const chat_id = this.checkAuthorisedAndReturnChatId();
+
+    const signal = state.signals.find(
+      ({ id, chat_id: ch_id }) => id === updateId && ch_id === chat_id
+    );
     if (!signal) return;
 
     Object.assign(signal, updateSignalDto);
-    this.signalsMap.set(signal, getSignalData(signal, this.lastDataIndex));
+    state.signalsMap.set(signal, getSignalData(signal, state.lastDataIndex));
   }
 
   remove(removeId: string) {
-    const index = this.signals.findIndex(({ id }) => id === removeId);
-    if (index !== -1) this.signals.splice(index, 1);
+    const chat_id = this.checkAuthorisedAndReturnChatId();
 
-    if (this.signals.length === 0) this.unsubscribe();
+    const index = state.signals.findIndex(
+      ({ id, chat_id: ch_id }) => id === removeId && ch_id === chat_id
+    );
+    if (index !== -1) state.signals.splice(index, 1);
+
+    if (state.signals.length === 0) unsubscribe();
   }
 }

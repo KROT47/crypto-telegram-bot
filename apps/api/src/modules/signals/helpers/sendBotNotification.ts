@@ -1,14 +1,14 @@
-import { sendTelegramBotNotification } from 'apps/api/src/shared/telegramWebApp';
-import { CreateSignalDto } from '../dto/create-signal.dto';
 import { getTelegramBotToken } from 'apps/api/src/entities/telegramWebApp';
+import { sendTelegramBotNotification } from 'apps/api/src/shared/telegramWebApp';
 import { formatPercent, formatPrice } from 'apps/api/src/shared/utils';
+import { SignalDto } from './SignalDto';
 
 export function sendBotNotification({
   signal,
   price,
   prevPrice,
 }: {
-  signal: CreateSignalDto;
+  signal: SignalDto;
   price: number;
   prevPrice: number;
 }) {
