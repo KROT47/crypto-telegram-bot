@@ -8,14 +8,23 @@ export type SignalFormData = {
   timeFrame: number;
 };
 
-const headers = {
-  Accept: 'application/json',
-  'Content-Type': 'application/json',
-};
+function getRequestOptions({
+  headers,
+  ...options
+}: RequestInit = {}): RequestInit {
+  return {
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      ...headers,
+      token: webApp.initData,
+    },
+    ...options,
+  };
+}
 
 function prepareSignalData(formData: SignalFormData) {
   return JSON.stringify({
-    initData: webApp.initData,
     ...formData,
   });
 }
@@ -26,12 +35,18 @@ async function handleFetchError(response: Response): Promise<Response> {
   throw new Error(body.message[0]);
 }
 
+export function getSignalsRequest(options: RequestInit) {
+  return fetch(signalsUrl, getRequestOptions(options)).then(handleFetchError);
+}
+
 export function createSignalRequest(formData: SignalFormData) {
-  return fetch(signalsUrl, {
-    method: 'post',
-    headers,
-    body: prepareSignalData(formData),
-  }).then(handleFetchError);
+  return fetch(
+    signalsUrl,
+    getRequestOptions({
+      method: 'post',
+      body: prepareSignalData(formData),
+    })
+  ).then(handleFetchError);
 }
 
 export function updateSignalRequest(
@@ -41,16 +56,18 @@ export function updateSignalRequest(
   const url = new URL(signalsUrl);
   url.pathname += `/${signalId}`;
 
-  return fetch(url, {
-    method: 'put',
-    headers,
-    body: prepareSignalData(formData),
-  }).then(handleFetchError);
+  return fetch(
+    url,
+    getRequestOptions({
+      method: 'put',
+      body: prepareSignalData(formData),
+    })
+  ).then(handleFetchError);
 }
 
 export const deleteSignalRequest = (signalId: string) => {
   const url = new URL(signalsUrl);
   url.pathname += `/${signalId}`;
 
-  return fetch(url, { method: 'delete', headers });
+  return fetch(url, getRequestOptions({ method: 'delete' }));
 };

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Signal } from './Signal';
-import { signalsUrl } from './signalsUrl';
+import { getSignalsRequest } from './signalsRequests';
 
 export function useSignals(retry: number): Signal[] {
   const [signals, setSignals] = useState<Signal[]>([]);
@@ -10,7 +10,7 @@ export function useSignals(retry: number): Signal[] {
     (async () => {
       try {
         const signal = controller.signal;
-        const response = await fetch(signalsUrl, { signal });
+        const response = await getSignalsRequest({ signal });
         const data = await response.json();
         setSignals(data);
       } catch (e) {

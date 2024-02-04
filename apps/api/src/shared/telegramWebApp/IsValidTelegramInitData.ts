@@ -1,6 +1,6 @@
 import { validate } from '@tma.js/init-data-node';
-import { parseInitData } from '@tma.js/sdk';
 import { ValidationOptions, registerDecorator } from 'class-validator';
+import { getUserIdFromInitData } from './getUserIdFromInitData';
 
 export function IsValidTelegramInitData(
   telegramBotTokenGetter: () => string,
@@ -22,9 +22,7 @@ export function IsValidTelegramInitData(
             return false;
           }
 
-          const data = parseInitData(value);
-
-          const id = data.user?.id;
+          const id = getUserIdFromInitData(value);
 
           return id !== undefined;
         },
