@@ -50,14 +50,21 @@ export function getPriceAPI(
         },
       });
 
-      const data = await response.json();
+      if (!response.ok) {
+        console.error(
+          'CoinMarketCap Error:',
+          `${response.status} ${response.statusText}`
+        );
+      } else {
+        const data = await response.json();
 
-      handlers.forEach(handler => handler(data));
+        handlers.forEach(handler => handler(data));
 
-      setTimeout(() => {
-        isRunning = false;
-        runPriceFetch();
-      }, pollIntervalMs);
+        setTimeout(() => {
+          isRunning = false;
+          runPriceFetch();
+        }, pollIntervalMs);
+      }
     }
   };
 
